@@ -19,7 +19,8 @@
  *
  * Alessandro Bahgat Shehata - ale dot bahgat at gmail dot com
  * Daniele Castagna - daniele dot castagna at gmail dot com
- *
+ * 
+ * Modified by Raul Jimenez
  */
 
 /**
@@ -46,11 +47,20 @@ public class Bencode {
     /**
      * This creates and parse a bencoded InputStream
      */
-    public Bencode(InputStream is) throws IOException {
+    public Bencode(InputStream is) throws BencodeError {
         if (!is.markSupported()) {
-            throw new IOException("is.markSupported should be true");
+            throw new BencodeError();//"is.markSupported should be true");
         }
-        rootElement = parse(is);
+        int extraChar;
+		try {
+        	rootElement = parse(is);
+			extraChar = is.read();
+        } catch (IOException e) {
+        	throw new BencodeError();
+        }
+		if (extraChar >= 0) {
+			throw new BencodeError();//"Expected EOF: extra char found");
+		}
     }
 
     /**
@@ -61,6 +71,7 @@ public class Bencode {
 
     /**
      * This method prints the bencoded file on the OutputStream os
+     * @throws IOException 
      */
     public void print(OutputStream os) throws IOException {
         print(rootElement, os);
@@ -107,7 +118,7 @@ public class Bencode {
         }
     }
 
-    private Object parse(InputStream is) throws IOException {
+    private Object parse(InputStream is) throws BencodeError, IOException {
         is.mark(0);
         int readChar = is.read();
         switch (readChar) {
@@ -127,10 +138,10 @@ public class Bencode {
             case '7':
             case '8':
             case '9':
-                is.reset();
+            	is.reset();
                 return parseByteString(is);
             default:
-                throw new IOException("Problem parsing bencoded file");
+                throw new BencodeError();//"Problem parsing bencoded file");
         }
     }
 
@@ -142,31 +153,36 @@ public class Bencode {
         this.rootElement = rootElement;
     }
 
-    private Long parseInteger(InputStream is) throws IOException {
+    private Long parseInteger(InputStream is) throws IOException, BencodeError {
 
         int readChar = is.read();
 
         StringBuffer buff = new StringBuffer();
         do {
             if (readChar < 0) {
-                throw new IOException("Unexpected EOF found");
+                throw new BencodeError();//"Unexpected EOF found");
             }
             buff.append((char) readChar);
             readChar = is.read();
         } while (readChar != 'e');
 
         // System.out.println("Loaded int: " + buff);
-        return Long.parseLong(buff.toString());
+        try{
+        	return Long.parseLong(buff.toString());
+        }
+        catch (NumberFormatException e){
+        	throw new BencodeError();
+        }
     }
 
-    private List<Object> parseList(InputStream is) throws IOException {
+    private List<Object> parseList(InputStream is) throws BencodeError, IOException {
 
         List<Object> list = new LinkedList<Object>();
         is.mark(0);
         int readChar = is.read();
         while (readChar != 'e') {
             if (readChar < 0) {
-                throw new IOException("Unexpected EOF found");
+                throw new BencodeError();//"Unexpected EOF found");
             }
             is.reset();
             list.add(parse(is));
@@ -177,13 +193,13 @@ public class Bencode {
         return list;
     }
 
-    private SortedMap parseDictionary(InputStream is) throws IOException {
+    private SortedMap parseDictionary(InputStream is) throws BencodeError, IOException {
         SortedMap<ByteBuffer, Object> map = new TreeMap<ByteBuffer, Object>(new DictionaryComparator());
         is.mark(0);
         int readChar = is.read();
         while (readChar != 'e') {
             if (readChar < 0) {
-                throw new IOException("Unexpected EOF found");
+                throw new BencodeError();//"Unexpected EOF found");
             }
             is.reset();
             map.put(parseByteString(is), parse(is));
@@ -194,25 +210,38 @@ public class Bencode {
         return map;
     }
 
-    private ByteBuffer parseByteString(InputStream is) throws IOException {
+    private ByteBuffer parseByteString(InputStream is) throws IOException, BencodeError {
 
         int readChar = is.read();
 
         StringBuffer buff = new StringBuffer();
         do {
             if (readChar < 0) {
-                throw new IOException("Unexpected EOF found");
+                throw new BencodeError();//"Unexpected EOF found");
             }
             buff.append((char) readChar);
             readChar = is.read();
         } while (readChar != ':');
-        Integer length = Integer.parseInt(buff.toString());
+        Integer length;
+        try{
+        	length = Integer.parseInt(buff.toString());
+        }
+        catch (NumberFormatException e){
+        	throw new BencodeError();
+        }
+        if (length == 0){
+        	throw new BencodeError();
+        }
 
         byte[] byteString = new byte[length];
         for (int i = 0; i < byteString.length; i++) {
-            byteString[i] = (byte) is.read();
+        	readChar = is.read();
+            byteString[i] = (byte) readChar;
         // System.out.println("Loaded string: " + new String(byteString));
         }
+        if (readChar < 0){
+            throw new BencodeError();//"Unexpected EOF found");
+        } 
         return ByteBuffer.wrap(byteString);
     }
 }
