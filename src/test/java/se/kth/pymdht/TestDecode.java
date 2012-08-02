@@ -1,5 +1,6 @@
 package se.kth.pymdht;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -8,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.junit.Before;
@@ -239,6 +241,47 @@ public class TestDecode{
 		fail();
 	}
 	
+	@Test
+	public void real_msg(){
+		String str = 
+"d1:rd2:id20:abcdefghij01234567895:token8:aoeusnth6:valuesl6:axje.u6:idhtnmee1:t2:aa1:y1:re";
+		InputStream in =  new ByteArrayInputStream(str.getBytes());
+		Bencode b = null;
+		try {
+			b = new Bencode(in);
+		} catch (BencodeError e) {
+			fail();
+		}
+		Map<ByteBuffer, Object> d = (Map<ByteBuffer, Object>) b.getRootElement();
+		Object elem = d.get(ByteBuffer.wrap("t".getBytes()));
+		assertNotNull(elem);
+		ByteBuffer tid = (ByteBuffer) d.get(ByteBuffer.wrap("t".getBytes()));
+		assertEquals("aa", new String(tid.array()));
+		
+		elem = d.get(ByteBuffer.wrap("y".getBytes()));
+		assertNotNull(elem);
+		ByteBuffer type = (ByteBuffer) d.get(ByteBuffer.wrap("y".getBytes()));
+		assertEquals("r", new String(type.array()));
+		
+		elem = d.get(ByteBuffer.wrap("r".getBytes()));
+		assertNotNull(elem);
+		d = (Map<ByteBuffer, Object>) d.get(ByteBuffer.wrap("r".getBytes()));
+		
+		elem = d.get(ByteBuffer.wrap("id".getBytes()));
+		assertNotNull(elem);
+		ByteBuffer id = (ByteBuffer) d.get(ByteBuffer.wrap("id".getBytes()));
+		assertEquals("abcdefghij0123456789", new String(id.array()));
+		
+		elem = d.get(ByteBuffer.wrap("values".getBytes()));
+		assertNotNull(elem);
+		List<ByteBuffer> peers = (List<ByteBuffer>) d.get(ByteBuffer.wrap("values".getBytes()));
+		assertEquals(2, peers.size());
+		
+		elem = peers.get(0);
+		assertNotNull(elem);
+		ByteBuffer c_peer = (ByteBuffer) peers.get(0);
+		assertEquals("axje.u", new String(c_peer.array()));
+	}
 	
 //	@Test
 //	public void test_decode(){
