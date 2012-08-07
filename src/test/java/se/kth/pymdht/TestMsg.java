@@ -31,4 +31,23 @@ public class TestMsg {
 		
 	}
 
+	@Test
+	public void parse_response_with_nodes() {
+		byte[] bencoded = "d1:rd2:id20:abcdefghij01234567895:nodes26:12345678901234567890abcdef5:token8:aoeusnthe1:t2:aa1:y1:re".getBytes();
+		DatagramPacket datagram = null;
+		try {
+			datagram = new DatagramPacket(bencoded, bencoded.length, InetAddress.getByAddress("1234".getBytes()), 8000);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		IncomingMsg msg = null;
+		try {
+			msg = new IncomingMsg(datagram);
+		} catch (MsgError e) {
+			e.printStackTrace();
+			fail();
+		}
+		assertEquals(1, msg.all_nodes.size());
+		
+	}
 }

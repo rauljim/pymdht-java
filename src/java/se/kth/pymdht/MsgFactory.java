@@ -11,9 +11,10 @@ public class MsgFactory {
 		this.src_id = src_id;
 	}
 	
-	public OutgoingMsg outgoing_get_peers_query(dst_node,info_hash,lookup_obj,experimental_obj){
-		msg = OutgoingMsg(this.version_label,dst_node,this.private_dht_name);
-		msg.make_query(this.src_id,experimental_obj,lookup_obj);
+	public OutgoingMsg outgoing_get_peers_query(Node dst_node, Id info_hash,
+			Object lookup_obj){
+		OutgoingMsg msg = new OutgoingMsg(dst_node);
+		msg.make_query(this.src_id, lookup_obj);
 		msg.get_peers_query(info_hash);
 		return msg;
 	}
@@ -24,8 +25,8 @@ public class MsgFactory {
 //		return msg;
 //	}
 
-	public IncomingMsg incoming_msg(DatagramPacket datagram){
-		msg = IncomingMsg(datagram);
+	public IncomingMsg incoming_msg(DatagramPacket datagram) throws MsgError{
+		IncomingMsg msg = new IncomingMsg(datagram);
 		return msg;
 	}
 }

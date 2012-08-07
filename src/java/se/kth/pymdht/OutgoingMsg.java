@@ -20,8 +20,8 @@ public class OutgoingMsg {
 	private Map<ByteBuffer, Object> args;
 	/*
 	 */
-	public OutgoingMsg(ByteBuffer version_label, Node dst_node){
-		this.version = version_label;
+	public OutgoingMsg(Node dst_node){
+		this.version = ByteBuffer.wrap("An00".getBytes());
 		this.dst_node = dst_node;
 		this._already_encoded = false;
 		this._dict = new TreeMap<ByteBuffer, Object>();
