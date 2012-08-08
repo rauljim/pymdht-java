@@ -15,6 +15,8 @@ import java.util.SortedMap;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.kth.pymdht.Bencode.BencodeError;
+
 public class TestDecode{
 	
 	@Before

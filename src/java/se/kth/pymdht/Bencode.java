@@ -41,6 +41,11 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class Bencode {
+	
+	static class BencodeError extends Exception {
+		private static final long serialVersionUID = 1L;
+	}
+
 
     private Object rootElement = null;
 

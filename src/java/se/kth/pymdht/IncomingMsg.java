@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+
 public class IncomingMsg {
 	/*
     Create an object by decoding the given Datagram object. Raise 'MsgError'
@@ -19,6 +20,12 @@ public class IncomingMsg {
 
     ?TODO: List attributes.
 	 */
+	
+	static  class MsgError extends Exception {
+		private static final long serialVersionUID = 1L;
+	}
+
+	
 	private DatagramPacket _datagram;
 	private Map<ByteBuffer, Object> top_dict;
 	private Vector<Node> nodes;

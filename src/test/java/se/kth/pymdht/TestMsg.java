@@ -8,6 +8,8 @@ import java.net.UnknownHostException;
 
 import org.junit.Test;
 
+import se.kth.pymdht.IncomingMsg.MsgError;
+
 
 public class TestMsg {
 

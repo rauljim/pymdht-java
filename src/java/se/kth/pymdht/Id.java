@@ -4,6 +4,10 @@ import java.math.BigInteger;
 
 public class Id {
 
+	public class IdError extends Exception {
+		private static final long serialVersionUID = 1L;
+	}
+	
 	public static final int BITS_PER_BYTE = 8;
 	public static final int ID_SIZE_BYTES = 20;
 	public static final int ID_SIZE_BITS = (ID_SIZE_BYTES*BITS_PER_BYTE);

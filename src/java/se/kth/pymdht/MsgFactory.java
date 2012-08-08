@@ -2,6 +2,8 @@ package se.kth.pymdht;
 
 import java.net.DatagramPacket;
 
+import se.kth.pymdht.IncomingMsg.MsgError;
+
 public class MsgFactory {
 	private byte[] version_label;
 	private Id src_id;
