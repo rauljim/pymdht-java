@@ -8,9 +8,14 @@ public class Node {
 	public Id id;
 	public Inet4Address ip;
 	public Node(InetSocketAddress addr, Id node_id){
-		//  debug only 
 		this.addr = addr;
 		this.id = node_id;
+		this.ip = (Inet4Address) addr.getAddress();
+	}
+	
+	public Node(InetSocketAddress addr){
+		this.addr = addr;
+		this.id = null;
 		this.ip = (Inet4Address) addr.getAddress();
 	}
 
