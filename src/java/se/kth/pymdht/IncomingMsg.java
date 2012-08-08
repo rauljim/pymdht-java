@@ -50,7 +50,6 @@ public class IncomingMsg {
 				throw new MsgError();
 			}
 			this.r_dict = (Map<ByteBuffer, Object>) this.top_dict.get(MsgConst.RESPONSE);
-			System.out.println("IncomingMsg");
 			// get nodes
 			ByteBuffer cnodes = (ByteBuffer) this.r_dict.get(MsgConst.NODES);
 			if (cnodes != null){
@@ -61,7 +60,6 @@ public class IncomingMsg {
 			}
 //			this.nodes2 = uncompact_nodes((ByteBuffer) this._msg_dict.get(MsgConst.NODES2));
 			this.all_nodes = this.nodes;
-			System.out.println("IncomingMsg nodes OK");
 			
 			// get peers
 			List<ByteBuffer> cpeers = (List<ByteBuffer>) this.r_dict.get(MsgConst.VALUES);
@@ -69,10 +67,8 @@ public class IncomingMsg {
 				this.peers = uncompact_peers(cpeers);
 			}
 			else{
-				System.out.println("IncomingMsg NO values");
 				this.peers = new Vector<InetSocketAddress>();
 			}
-			System.out.println("IncomingMsg peers OK");
 		}
 		catch (Exception e){
 			throw new MsgError();
@@ -107,8 +103,6 @@ public class IncomingMsg {
 	}
 	
 	private Vector<InetSocketAddress> uncompact_peers(List<ByteBuffer> c_peers) throws MsgError{
-		System.out.println("uncompact peers");
-		
 		Vector<InetSocketAddress> peers = new Vector<InetSocketAddress>();
 		Inet4Address addr;
 		int port;
@@ -124,7 +118,6 @@ public class IncomingMsg {
 				pos += 4;
 				port = (char)cp[pos] * 256 + (char)cp[pos + 1]; 
 				pos += 2;
-				System.out.println(new InetSocketAddress(addr, port));
 				peers.add(new InetSocketAddress(addr, port));
 			}
 			catch (Exception e){
