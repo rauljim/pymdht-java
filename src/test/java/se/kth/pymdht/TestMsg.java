@@ -30,7 +30,7 @@ public class TestMsg {
 			e.printStackTrace();
 			fail();
 		}
-		assertEquals(2, msg.peers.size());
+		assertEquals(2, msg.cpeers.size());
 		
 	}
 

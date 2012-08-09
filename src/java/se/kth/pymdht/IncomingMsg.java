@@ -6,6 +6,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class IncomingMsg {
 	private Map<ByteBuffer, Object> top_dict;
 	private Vector<Node> nodes;
 	public Vector<Node> all_nodes;
-	public Vector<InetSocketAddress> peers;
+	public List<ByteBuffer> cpeers;
 	private Map<ByteBuffer, Object> r_dict;
 	public IncomingMsg(DatagramPacket datagram) throws MsgError{
 		_datagram = datagram;
@@ -64,10 +65,10 @@ public class IncomingMsg {
 			// get peers
 			List<ByteBuffer> cpeers = (List<ByteBuffer>) this.r_dict.get(MsgConst.VALUES);
 			if (cpeers != null){	
-				this.peers = uncompact_peers(cpeers);
+				this.cpeers = cpeers;//uncompact_peers(cpeers);
 			}
 			else{
-				this.peers = new Vector<InetSocketAddress>();
+				this.cpeers = new ArrayList<ByteBuffer>(0);
 			}
 		}
 		catch (Exception e){
