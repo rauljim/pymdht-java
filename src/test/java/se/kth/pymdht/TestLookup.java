@@ -3,8 +3,10 @@ package se.kth.pymdht;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
+import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.kth.pymdht.Id.IdError;
+import se.kth.pymdht.IncomingMsg.MsgError;
 
 public class TestLookup{
 	Id info_hash=null, id1=null, id2=null, id3=null, id4 = null;
@@ -90,5 +93,55 @@ public class TestLookup{
 		assertEquals(node2.addr, nodes_to_query.get(0).addr);
 		nodes_to_query = lq.get_nodes_to_query();
 		assertEquals(0, nodes_to_query.size());
-}
+	}
+	
+	@Test 
+	public void get_peers(){
+		OverlayBootstrapper bootstrapper = new OverlayBootstrapper();
+		GetPeersLookup lookup = new GetPeersLookup(info_hash, bootstrapper);
+		
+		//unstable nodes
+		List<DatagramPacket> datagrams;
+		for (int i=0; i<GetPeersLookup.MAX_UNSTABLE_ROUNDS; i++){
+			datagrams = lookup.get_datagrams();
+			assertEquals(GetPeersLookup.NUM_UNSTABLE_PER_ROUND, datagrams.size());
+		}
+		//stable node (just one)
+		datagrams = lookup.get_datagrams();
+		assertEquals(1, datagrams.size());
+		//that's it
+		datagrams = lookup.get_datagrams();
+		assertEquals(0, datagrams.size());
+		//get nodes
+		byte[] bencoded = "d1:rd2:id20:abcdefghij01234567895:nodes26:12345678901234567890abcdef5:token8:aoeusnthe1:t2:aa1:y1:re".getBytes();
+		IncomingMsg msg = null;
+		try {
+			msg = new IncomingMsg(new DatagramPacket(bencoded, bencoded.length, node1.addr));
+		} catch (SocketException e) {
+			e.printStackTrace();
+			fail();
+		} catch (MsgError e) {
+			e.printStackTrace();
+			fail();
+		}
+		lookup.on_response(msg);
+		assertEquals(0, lookup.get_cpeers().size());
+		datagrams = lookup.get_datagrams();
+		assertEquals(1, datagrams.size());
+		//get peers
+		bencoded = "d1:rd2:id20:abcdefghij01234567895:token8:aoeusnth6:valuesl6:axje.u6:idhtnmee1:t2:aa1:y1:re".getBytes();
+		try {
+			msg = new IncomingMsg(new DatagramPacket(bencoded, bencoded.length, node2.addr));
+		} catch (SocketException e) {
+			e.printStackTrace();
+			fail();
+		} catch (MsgError e) {
+			e.printStackTrace();
+			fail();
+		}
+		lookup.on_response(msg);
+		assertEquals(2, lookup.get_cpeers().size());
+		datagrams = lookup.get_datagrams();
+		assertEquals(0, datagrams.size());
+	}
 }

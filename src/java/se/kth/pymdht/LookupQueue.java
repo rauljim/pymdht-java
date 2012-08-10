@@ -71,7 +71,7 @@ class LookupQueue {
 			}
 			else{
 				if (this.stable_addrs.size() > 0){
-					node = new Node(this.unstable_addrs.remove(0));
+					node = new Node(this.stable_addrs.remove(0));
 					nodes_to_query.add(node);
 				}
 			}
