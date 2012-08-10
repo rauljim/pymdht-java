@@ -54,13 +54,20 @@ class LookupQueue {
 
 		if (this.queue.size() > 0){
 			QueuedNode candidate_qnode = this.queue.first();
+			assert this.closest_responded_qnodes.size() <= REPLICA_SIZE;
 			if (this.closest_responded_qnodes.size() < REPLICA_SIZE ||
 					candidate_qnode.distance.compareTo(this.closest_responded_qnodes.last().distance) < 0){
 				this.queue.remove(candidate_qnode);
 				nodes_to_query.add(candidate_qnode.node);
+				System.out.println("query to log_distance " + candidate_qnode.distance.log);
+				if (this.closest_responded_qnodes.size() > REPLICA_SIZE){
+					QueuedNode last = this.closest_responded_qnodes.last();
+					this.closest_responded_qnodes.remove(last);					
+				}
 			}
 		}
 		else{
+			System.out.println("bootstrap");
 			Node node;
 			if (this.unstable_addrs.size() > 0){
 				int num_nodes = Math.min(this.unstable_addrs.size(), GetPeersLookup.NUM_UNSTABLE_PER_ROUND);
