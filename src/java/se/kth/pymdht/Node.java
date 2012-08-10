@@ -7,6 +7,7 @@ public class Node {
 	public InetSocketAddress addr;
 	public Id id;
 	public Inet4Address ip;
+	
 	public Node(InetSocketAddress addr, Id node_id){
 		this.addr = addr;
 		this.id = node_id;
