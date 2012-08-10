@@ -11,7 +11,7 @@ import java.util.Random;
 class GetPeersLookup{
 	
 	static final int MAX_UNSTABLE_ROUNDS = 5;
-	static final int NUM_UNSTABLE_PER_ROUND = 16;
+	static final int NUM_UNSTABLE_PER_ROUND = 8;
 	private Id info_hash;
 	private LookupQueue lookup_queue;
 	private RandomId my_id;
