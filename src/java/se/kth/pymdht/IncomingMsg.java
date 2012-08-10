@@ -53,6 +53,7 @@ public class IncomingMsg {
 			ByteBuffer cnodes = (ByteBuffer) this.r_dict.get(MsgConst.NODES);
 			if (cnodes != null){
 				this.nodes = uncompact_nodes(cnodes);
+				System.out.println(nodes.size() + " nodes");
 			}
 			else{
 				this.nodes = new Vector<Node>();
@@ -64,12 +65,14 @@ public class IncomingMsg {
 			List<ByteBuffer> cpeers = (List<ByteBuffer>) this.r_dict.get(MsgConst.VALUES);
 			if (cpeers != null){	
 				this.cpeers = cpeers;//uncompact_peers(cpeers);
+				System.out.println("peers");
 			}
 			else{
 				this.cpeers = new ArrayList<ByteBuffer>(0);
 			}
 		}
 		catch (Exception e){
+//			e.printStackTrace();
 			throw new MsgError();
 		}
 	}
@@ -90,11 +93,12 @@ public class IncomingMsg {
 				pos += 20;
 				addr = (Inet4Address) InetAddress.getByAddress(Arrays.copyOfRange(cn, pos, pos + 4));
 				pos += 4;
-				port = (char)cn[pos] * 256 + (char)cn[pos + 1]; 
+				port = (cn[pos] & 0xFF) * 256 + (cn[pos + 1] & 0xFF); 
 				pos += 2;
 				nodes.add(new Node(new InetSocketAddress(addr, port), id));
 			}
 			catch (Exception e){
+				e.printStackTrace();
 				nodes = new Vector<Node>();
 			}
 		}
