@@ -64,7 +64,7 @@ public class Bencode {
         	throw new BencodeError();
         }
 		if (extraChar >= 0) {
-			throw new BencodeError();//"Expected EOF: extra char found");
+//			throw new BencodeError();//"Expected EOF: extra char found");
 		}
     }
 
