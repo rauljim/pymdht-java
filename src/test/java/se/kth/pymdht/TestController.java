@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import se.kth.pymdht.Controller.LookupDone;
 import se.kth.pymdht.IncomingMsg.MsgError;
 
 public class TestController{
@@ -19,7 +20,13 @@ public class TestController{
 		
 		Controller c = new Controller();
 		//waiting for ppsp/swift handshake
-		List<DatagramPacket> datagrams_to_send = c.on_heartbeat();
+		List<DatagramPacket> datagrams_to_send = null;
+		try {
+			datagrams_to_send = c.on_heartbeat();
+		} catch (LookupDone e1) {
+			e1.printStackTrace();
+			fail();
+		}
 		assertEquals(0, datagrams_to_send.size());
 		//handshake comes
 		byte [] raw_handshake = {0,0,0,0, 4, 0,0,0,0, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0, 0, 1,2,3,4};
@@ -35,7 +42,12 @@ public class TestController{
 		assertEquals(GetPeersLookup.NUM_UNSTABLE_PER_ROUND + 1, datagrams_to_send.size());
 
 		// no responses, socket times out: more queries
-		datagrams_to_send = c.on_heartbeat();
+		try {
+			datagrams_to_send = c.on_heartbeat();
+		} catch (LookupDone e1) {
+			e1.printStackTrace();
+			fail();
+		}
 		assertEquals(GetPeersLookup.NUM_UNSTABLE_PER_ROUND, datagrams_to_send.size());
 		
 		// get nodes
@@ -51,7 +63,12 @@ public class TestController{
 		assertEquals(1, datagrams_to_send.size());
 		assertEquals(25958, datagrams_to_send.get(0).getPort()); //'ef' == 25958
 		//back to bootstrap nodes
-		datagrams_to_send = c.on_heartbeat();
+		try {
+			datagrams_to_send = c.on_heartbeat();
+		} catch (LookupDone e1) {
+			e1.printStackTrace();
+			fail();
+		}
 		assertEquals(GetPeersLookup.NUM_UNSTABLE_PER_ROUND, datagrams_to_send.size());
 		
 		//get peers
