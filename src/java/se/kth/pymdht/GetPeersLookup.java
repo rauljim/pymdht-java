@@ -56,7 +56,6 @@ class GetPeersLookup{
 				e.printStackTrace();
 			}
 		}
-		
 		return datagrams;
 	}
 }
