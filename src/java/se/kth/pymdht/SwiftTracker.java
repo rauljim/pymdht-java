@@ -42,8 +42,8 @@ public class SwiftTracker{
 		if (this.hash != null){
 			return FAILED;
 		}
-		if (data.length != CHANNEL_SIZE + 1 + BIN_SIZE + HASH_SIZE + 1 + CHANNEL_SIZE){
-			System.out.println(data.length);
+		if (datagram.getLength() != CHANNEL_SIZE + 1 + BIN_SIZE + HASH_SIZE + 1 + CHANNEL_SIZE){
+			System.out.println(datagram.getLength());
 			System.out.println(CHANNEL_SIZE + 1 + BIN_SIZE + HASH_SIZE + 1 + CHANNEL_SIZE);
 			return FAILED;
 		}
