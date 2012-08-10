@@ -25,10 +25,15 @@ public class Controller {
 	}
 	
 	public List<DatagramPacket> on_heartbeat(){
+		List<DatagramPacket> datagrams_to_send;
 		if (this.lookup == null){
-			return new ArrayList<DatagramPacket>(0);
+			datagrams_to_send = new ArrayList<DatagramPacket>(0);
 		}
-		return lookup.get_datagrams();
+		else{
+			datagrams_to_send = lookup.get_datagrams();
+		}
+		System.out.println(System.currentTimeMillis() + " heartbeat sends " + datagrams_to_send.size());
+	return datagrams_to_send;
 	}
 	
 	public List<DatagramPacket> on_datagram_received(DatagramPacket datagram){
@@ -60,11 +65,13 @@ public class Controller {
 			//peers
 			List<ByteBuffer> cpeers = lookup.get_cpeers();
 			if (cpeers.size() > 0){
+				System.out.println(System.currentTimeMillis() + " peers " +cpeers.size());
 				DatagramPacket pex_datagram = swift_tracker.get_swift_pex_datagram(cpeers);
 				datagrams_to_send.add(pex_datagram);
 			}
 			
 		}
+		System.out.println(System.currentTimeMillis() + " on_datagram sends " + datagrams_to_send.size());
 		return datagrams_to_send;
 	}
 }
