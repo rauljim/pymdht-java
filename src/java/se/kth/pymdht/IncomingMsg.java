@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import se.kth.pymdht.Id.IdError;
+
 
 public class IncomingMsg {
 	
@@ -41,7 +43,12 @@ public class IncomingMsg {
 			this.r_dict = (Map<ByteBuffer, Object>) this.top_dict.get(MsgConst.RESPONSE);
 			
 			ByteBuffer bin_id = (ByteBuffer) this.r_dict.get(MsgConst.ID);
-			this.src_node = new Node((InetSocketAddress) datagram.getSocketAddress(), new Id(bin_id.array()));
+			try{
+				this.src_node = new Node((InetSocketAddress) datagram.getSocketAddress(), new Id(bin_id.array()));
+			}
+			catch (IdError e){
+				throw new MsgError();
+			}
 			// get nodes
 			ByteBuffer cnodes = (ByteBuffer) this.r_dict.get(MsgConst.NODES);
 			if (cnodes != null){
