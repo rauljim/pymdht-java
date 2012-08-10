@@ -6,9 +6,11 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.List;
 
+import se.kth.pymdht.Controller.LookupDone;
+
 public class Reactor {
 
-	int timeout_delay = 50;
+	int timeout_delay = 100;
 	private boolean _running;
 	private DatagramSocket _s;
 	private Controller _controller;
@@ -25,7 +27,7 @@ public class Reactor {
 		this._running = true;
 		try{
 			while (this._running){
-				this.run_one_step();
+				this._running = this.run_one_step();
 			}
 		}
 		catch (Exception e){
@@ -33,7 +35,7 @@ public class Reactor {
 		}
 	}
 
-	public void run_one_step(){
+	public boolean run_one_step(){
 		List<DatagramPacket> datagrams_to_send = null;
 		byte[] buf = new byte[2000];
 		DatagramPacket datagram = new DatagramPacket(buf, buf.length);
@@ -42,12 +44,15 @@ public class Reactor {
 			datagrams_to_send =  _controller.on_datagram_received(datagram);
 		}
 		catch (SocketTimeoutException e){
-			datagrams_to_send = _controller.on_heartbeat();
+			try {
+				datagrams_to_send = _controller.on_heartbeat();
+			} catch (LookupDone e1) {
+				return false;
+			}
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return;
+			return true;
 		}
 		for(DatagramPacket datagram_to_send : datagrams_to_send){
 			try{
@@ -57,5 +62,6 @@ public class Reactor {
 				e.printStackTrace();
 			}
 		}
+		return true;
 	}
 }

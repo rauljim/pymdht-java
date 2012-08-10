@@ -9,34 +9,52 @@ import se.kth.pymdht.IncomingMsg.MsgError;
 
 public class Controller {
 	
+	public class LookupDone extends Exception {
+		private static final long serialVersionUID = 1L;
+	}
+
+	private static final int MAX_EMPTY_HEARTBEATS = 5;
 	private Id _my_id;
 	private SwiftTracker swift_tracker = new SwiftTracker();
 	private GetPeersLookup lookup;
 	private OverlayBootstrapper bootstrapper;
+	private int empty_heartbeats_in_a_row;
 	
 	public Controller(){
 		this._my_id = new RandomId();
 		this.bootstrapper = new OverlayBootstrapper();
 		this.lookup = null;
+		empty_heartbeats_in_a_row = 0;
 	}
 	
 	public void start(){
 		
 	}
 	
-	public List<DatagramPacket> on_heartbeat(){
+	public List<DatagramPacket> on_heartbeat() throws LookupDone{
 		List<DatagramPacket> datagrams_to_send;
 		if (this.lookup == null){
 			datagrams_to_send = new ArrayList<DatagramPacket>(0);
 		}
 		else{
 			datagrams_to_send = lookup.get_datagrams();
+			if (datagrams_to_send.size() == 0){
+				this.empty_heartbeats_in_a_row += 1;
+				System.out.println(this.empty_heartbeats_in_a_row);
+				if (this.empty_heartbeats_in_a_row > MAX_EMPTY_HEARTBEATS){
+					throw new LookupDone();
+				}
+			}
+			else{
+				this.empty_heartbeats_in_a_row = 0;
+			}
 		}
 		System.out.println(System.currentTimeMillis() + " heartbeat sends " + datagrams_to_send.size());
-	return datagrams_to_send;
+		return datagrams_to_send;
 	}
 	
 	public List<DatagramPacket> on_datagram_received(DatagramPacket datagram){
+		this.empty_heartbeats_in_a_row = 0;
 		List<DatagramPacket> datagrams_to_send = new ArrayList<DatagramPacket>();
 		IncomingMsg msg = null;
 		try{
