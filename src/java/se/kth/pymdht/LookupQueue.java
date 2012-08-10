@@ -11,7 +11,7 @@ import java.util.TreeSet;
 
 class LookupQueue {
 
-	private static final int REPLICA_SIZE = 3;
+	private static final int REPLICA_SIZE = 5;
 	private SortedSet<QueuedNode> queue;
 	private SortedSet<QueuedNode> closest_responded_qnodes;
 	private Set<Inet4Address> queued_ips;
@@ -55,8 +55,14 @@ class LookupQueue {
 		if (this.queue.size() > 0){
 			QueuedNode candidate_qnode = this.queue.first();
 			assert this.closest_responded_qnodes.size() <= REPLICA_SIZE;
+			System.out.println(closest_responded_qnodes.size() + " closest qnodes");
+
+			for(QueuedNode qnode : closest_responded_qnodes){
+				System.out.println("closest log: " + qnode.distance.log);
+			}
 			if (this.closest_responded_qnodes.size() < REPLICA_SIZE ||
 					candidate_qnode.distance.compareTo(this.closest_responded_qnodes.last().distance) < 0){
+				this.closest_responded_qnodes.add(candidate_qnode);
 				this.queue.remove(candidate_qnode);
 				nodes_to_query.add(candidate_qnode.node);
 				System.out.println("query to log_distance " + candidate_qnode.distance.log);
